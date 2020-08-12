@@ -31,13 +31,14 @@ export default {
         return alert("Field can't be empty");
       }
       await this.login({
+        user: this.$route.name,
         username: this.username,
         password: this.password,
       });
 
-      if (this.user_exist == "0" && this.logginuser == "Admin") {
+      if (this.user_exist !== "") {
         this.$router.push("poll");
-      } else if (this.user_exist == "0" && this.logginuser == "Login") {
+      } else if (this.user_exist == "0" && this.logginuser == "Guest") {
         this.$router.push("profile");
       } else if (this.user_exist == "1") {
         alert("User not Exist");
@@ -55,6 +56,7 @@ export default {
     }),
 
     login_progress() {
+      console.log("Hi");
       return this.$store.state.login.login_progress;
     },
   },

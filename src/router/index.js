@@ -51,7 +51,7 @@ const router = new VueRouter({
 //   } else {
 //     next();
 //   }
-//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'poll') && store.getters.logginuser === 'Login') {
+//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'poll') && store.getters.logginuser === 'Guest') {
 //     next('/profile')
 //   } else {
 //     next();

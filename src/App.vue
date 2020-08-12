@@ -10,10 +10,10 @@ export default {
   name: "app",
 
   computed: {
-    ...mapGetters(["logginpage"]),
+    ...mapGetters(["logginuser"]),
   },
   mounted() {
-    if (this.logginuser == "Login") {
+    if (this.logginuser == "Guest") {
       this.$router.push("/profile");
     } else if (this.logginuser == "Admin") {
       this.$router.push("/poll");

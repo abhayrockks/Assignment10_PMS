@@ -7,17 +7,16 @@ export default {
         register_progress: false,
         add_poll: false,
         delete_poll: false,
+        edit_poll: false,
         user_exist: {},
         token_value: {},
         polls: {},
-        search: {},
         updatedpoll: {}
     },
     getters: {
-        filter_data: state => state.search,
         api_error: state => state.error,
         user_exist: state => state.user_exist.error,
-        logginuser: state => state.token_value.user,
+        logginUser: state => state.token_value.role,
         isLoggedIn: state => state.token_value.username,
         list_polls: state => state.polls,
     },
@@ -30,15 +29,12 @@ export default {
                 if (response.data.error == '0') {
                     commit("user_exist", payload)
                     commit("extract_token", response.data.token)
+                    const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                    commit("list_polls", listofpolls.data);
                     commit("login_progress", false);
                 } else {
                     commit("user_exist", response.data)
                     commit("login_progress", false);
-                }
-                if (payload.user === 'Admin') {
-                    const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
-                    commit("list_polls", listofpolls.data);
-                    console.log(listofpolls.data)
                 }
                 return true
             } catch (err) {
@@ -54,7 +50,8 @@ export default {
         async register({ commit }, payload) {
             try {
                 commit("register_progress", true);
-                await axios.post(`https://secure-refuge-14993.herokuapp.com/add_user?username=${payload.username}&password=${payload.password}&role=${payload.role}`);
+                const response = await axios.post(`https://secure-refuge-14993.herokuapp.com/add_user?username=${payload.username}&password=${payload.password}&role=${payload.role}`);
+                commit("user_exist", response.data)
                 commit("register_progress", false);
                 return true
             } catch (err) {
@@ -65,10 +62,20 @@ export default {
         },
 
         async addnewpoll({ commit }, payload) {
+            let options_string = "";
+            payload.options.map((opt, index) => {
+                if (index == payload.options.length - 1) {
+                    options_string += opt;
+                }
+                else {
+                    options_string += opt + '____';
+                }
+            })
             try {
                 commit("add_poll", true);
-                const response = await axios.post(`https://secure-refuge-14993.herokuapp.com/add_poll?title=${payload.title}%20polll&options=${payload.options[0].answer}`);
-                commit("update_list", response.data)
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/add_poll?title=${payload.title}%20polll&options=${options_string}`);
+                const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                commit("list_polls", listofpolls.data);
                 commit("add_poll", false);
                 return true
             } catch (err) {
@@ -78,16 +85,30 @@ export default {
             }
         },
 
-        async deletepoll({ commit }, index) {
-            console.log(index)
+        async deletepoll({ commit }, id) {
             try {
                 commit(" delete_poll", true);
-                const response = await axios.post(`https://secure-refuge-14993.herokuapp.com/delete_poll?id=${index}`);
-                console.log(response)
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/delete_poll?id=${id}`);
+                const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                commit("list_polls", listofpolls.data);
                 commit(" delete_poll", false);
                 return true
             } catch (err) {
                 commit(" delete_poll", false);
+                commit("error", err)
+                return false
+            }
+        },
+        async editpoll({ commit }, payload) {
+            try {
+                commit("edit_poll", true);
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.id}&title=${payload.title}`);
+                const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                commit("list_polls", listofpolls.data);
+                commit("edit_poll", false);
+                return true
+            } catch (err) {
+                commit("edit_poll", false);
                 commit("error", err)
                 return false
             }
@@ -123,14 +144,9 @@ export default {
             state.user_exist = {};
             state.polls = {};
             state.updatedpoll = {};
-            state.search = {};
         },
         list_polls: (state, data) => {
             state.polls = data.data;
-            state.search = data.data.filter(function (array) {
-                // console.log(array.title, "Hiiii")
-                return array.title === "abhay";
-            })
         },
         add_poll: (state, data) => {
             state.add_poll = data;
@@ -138,11 +154,10 @@ export default {
         error: (state, data) => {
             state.error = data;
         },
-        update_list: (state, data) => {
-            state.updatedpoll = data.data;
-            state.polls = Object.assign(state.polls, state.updatedpoll);
-        },
         delete_poll: (state, data) => {
+            state.delete_poll = data;
+        },
+        edit_poll: (state, data) => {
             state.delete_poll = data;
         },
     }

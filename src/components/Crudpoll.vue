@@ -11,7 +11,8 @@
     </ul>-->
     <div id="body">
       <li v-for="(item, index) in list_polls" v-bind:key="index">
-        <a @click="deletepoll(index)" class="button">Delete</a>
+        <a v-on:click="deletethepoll(item._id)" class="button">Delete</a>
+        <a v-on:click="editthepoll(item._id)" class="button">Edit</a>
         <div id="container">
           <div class="item">
             <B>Q</B>
@@ -24,15 +25,32 @@
         </div>
         <hr />
       </li>
+      <EditPoll
+        v-bind:prop_title="title"
+        v-bind:prop_id="id"
+        v-if="showModal"
+        @close="showModal = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import EditPoll from "./Editpoll";
 import { mapGetters, mapActions } from "vuex";
 export default {
-  name: "PollList",
-
+  name: "Crudpoll",
+  components: {
+    EditPoll,
+  },
+  data() {
+    return {
+      title: "",
+      options: [],
+      showModal: false,
+      id: "",
+    };
+  },
   computed: {
     ...mapGetters({
       list_polls: "list_polls",
@@ -41,10 +59,18 @@ export default {
 
   methods: {
     ...mapActions(["deletepoll"]),
-    async deletepoll(index) {
-      await this.deletepoll({
-        index: index,
+    async deletethepoll(id) {
+      if (confirm("Do you really want to delete?")) {
+        await this.deletepoll(id);
+      }
+    },
+    editthepoll(id) {
+      const editpoll = this.list_polls.filter(function (array) {
+        return array._id === id;
       });
+      this.title = editpoll[0].title;
+      this.id = editpoll[0]._id;
+      this.showModal = true;
     },
   },
 };

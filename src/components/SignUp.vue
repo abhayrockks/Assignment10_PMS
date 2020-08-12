@@ -25,7 +25,7 @@
               <span>Select user</span>
             </template>
             <template v-if="isPublic == 'Guest'">
-              <span>Guest user</span>
+              <span>Guest</span>
             </template>
             <template v-if="isPublic == 'Admin'">
               <span>Admin</span>
@@ -33,7 +33,7 @@
           </p>
 
           <b-dropdown-item value="Guest" aria-role="listitem">
-            <h3>Guest user</h3>
+            <h3>Guest</h3>
           </b-dropdown-item>
 
           <b-dropdown-item value="Admin" aria-role="listitem">
@@ -77,13 +77,22 @@ export default {
         password: this.password,
         role: this.isPublic,
       });
-      if (this.user_exist == "0") {
-        alert("Successfully Registered");
-      } else if (this.user_exist == "1") {
-        alert("User already Exist");
+      if (this.user_exist === 0) {
+        this.refreshdetails();
+        return alert("Successfully Registered");
+      } else if (this.user_exist === 1) {
+        this.refreshdetails();
+        return alert("User already Exist");
       } else {
-        alert(this.api_error);
+        return alert(this.api_error);
       }
+    },
+
+    refreshdetails() {
+      this.username = "";
+      this.password = "";
+      this.confirm_password = "";
+      this.isPublic = "";
     },
   },
 

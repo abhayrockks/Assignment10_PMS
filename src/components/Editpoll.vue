@@ -1,5 +1,5 @@
 <template>
-  <div id="submitForm">
+  <div id="editForm">
     <transition name="modal">
       <div class="modal-mask">
         <div class="modal-wrapper">
@@ -20,7 +20,7 @@
                   <span class="delete" @click="deleteInput(index)">delete</span>
                 </div>
                 <br />
-                <button>Add</button>
+                <button>Update</button>
                 <button id="cancel" @click="cancel">Cancel</button>
               </form>
             </div>
@@ -34,45 +34,35 @@
 <script>
 import { mapActions } from "vuex";
 export default {
-  name: "Newpollform",
+  name: "EditPoll",
   data() {
     return {
       poll: {
-        question: "",
+        question: this.prop_title,
         answers: [""],
       },
     };
   },
+
+  props: {
+    prop_title: { type: String, default: "" },
+    prop_id: { type: String, default: "" },
+  },
   methods: {
-    createNewInput(index) {
-      if (this.poll.answers.length - 1 == index) {
-        this.poll.answers.push("");
-      }
-    },
-
-    deleteInput(index) {
-      if (index > 0 || this.poll.answers.length > 1) {
-        this.poll.answers.splice(index, 1);
-      }
-    },
-
     cancel() {
       this.$emit("close");
     },
-
-    ...mapActions(["addnewpoll"]),
+    ...mapActions(["editpoll"]),
     async adduser() {
       if (this.poll.question == "") {
         return alert("Please add or cancel");
       }
 
-      await this.addnewpoll({
+      await this.editpoll({
         title: this.poll.question,
-        options: this.poll.answers.filter(function (array) {
-          return array !== "";
-        }),
-      });
-      this.$emit("close");
+        id: this.prop_id,
+      }),
+        this.$emit("close");
     },
   },
 };

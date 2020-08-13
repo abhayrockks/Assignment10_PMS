@@ -1,109 +1,95 @@
 <template>
-  <div id="submitForm">
-    <transition name="modal">
-      <div class="modal-mask">
-        <div class="modal-wrapper">
-          <div class="modal-container">
-            <div class="modal-body">
-              <form v-on:submit.prevent="adduser">
-                <div class="form-group">
-                  <input type="text" placeholder="Your Question..." v-model="poll.question" />
-                </div>
-                <br />
-                <div v-for="(answer, index) in poll.answers" :key="index">
-                  <input
-                    :placeholder="'Answer ' + (index + 1)"
-                    @focus="createNewInput(index)"
-                    v-model="poll.answers[index]"
-                    type="text"
-                  />
-                  <span class="delete" @click="deleteInput(index)">delete</span>
-                </div>
-                <br />
-                <button>Add</button>
-                <button id="cancel" @click="cancel">Cancel</button>
-              </form>
-            </div>
+  <div>
+    <nav class="navbar is-warning" role="navigation" aria-label="main navigation">
+      <div class="navbar-item">
+        <a>
+          <router-link to="/">Home</router-link>
+        </a>
+        <p v-if="isLoggedIn">{{isLoggedIn}}</p>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <a
+              v-if="createpollbutton && isLoggedIn"
+              @click="showModal = true"
+              class="button is-white"
+            >Create</a>
+            <a v-if="adminbuttonshow && !isLoggedIn" @click="admin" class="button is-white">Admin</a>
+            <a v-if="loginbuttonshow && !isLoggedIn" @click="login" class="button is-white">Login</a>
+            <a v-if="isLoggedIn" @click="logout" class="button is-white">Logout</a>
           </div>
         </div>
       </div>
-    </transition>
+    </nav>
+    <NewPollForm v-if="showModal" @close="showModal = false" />
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import NewPollForm from "./NewPollForm.vue";
+import { mapGetters, mapActions } from "vuex";
 export default {
-  name: "Newpollform",
+  name: "Header",
+  components: {
+    NewPollForm,
+  },
   data() {
     return {
-      poll: {
-        question: "",
-        answers: [""],
-      },
+      adminbuttonshow: true,
+      loginbuttonshow: true,
+      createpollbutton: false,
+      showModal: false,
     };
   },
+
+  computed: {
+    ...mapGetters({
+      isLoggedIn: "isLoggedIn",
+      logginUser: "logginUser",
+    }),
+  },
   methods: {
-    createNewInput(index) {
-      if (this.poll.answers.length - 1 == index) {
-        this.poll.answers.push("");
+    ...mapActions({
+      dologout: "logout",
+    }),
+    login() {
+      if (this.$route.name !== "Login") {
+        this.$router.push("login");
       }
     },
-
-    deleteInput(index) {
-      if (index > 0 || this.poll.answers.length > 1) {
-        this.poll.answers.splice(index, 1);
+    logout() {
+      this.dologout();
+      this.loginbuttonshow = true;
+      this.adminbuttonshow = true;
+      this.createpollbutton = false;
+      this.$router.push("/");
+    },
+    admin() {
+      if (this.$route.name !== "Admin") {
+        this.createpollbutton = true;
+        this.$router.push("admin");
       }
     },
-
-    cancel() {
-      this.$emit("close");
-    },
-
-    ...mapActions(["addnewpoll"]),
-    async adduser() {
-      if (this.poll.question == "") {
-        return alert("Please add or cancel");
-      }
-
-      await this.addnewpoll({
-        title: this.poll.question,
-        options: this.poll.answers.filter(function (array) {
-          return array !== "";
-        }),
-      });
-      this.$emit("close");
-    },
+  },
+  mounted() {
+    if (this.$route.name === "Admin") {
+      this.loginbuttonshow = false;
+    } else if (this.$route.name === "Login") {
+      this.adminbuttonshow = false;
+    }
+    if (this.logginUser === "Admin") {
+      this.createpollbutton = true;
+    }
   },
 };
 </script>
 
-<style scoped>
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: table;
-  transition: opacity 0.3s ease;
+<style>
+a {
+  margin-right: 10px;
 }
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.modal-container {
-  width: 300px;
-  margin: 0px auto;
-  padding: 20px 30px;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-  transition: all 0.3s ease;
-  font-family: Helvetica, Arial, sans-serif;
+#cancel {
+  margin-left: 10px;
 }
 </style>

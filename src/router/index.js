@@ -32,6 +32,13 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
+    //   beforeEnter: (to, from, next) => {
+    //   if (from.name == 'Login') {
+    //     next()
+    //   } else {
+    //     next('/login')
+    //   }
+    // },
     meta: { requiresAuth: true }
   }
 ]

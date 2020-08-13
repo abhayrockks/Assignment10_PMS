@@ -9,23 +9,22 @@
       </div>
     </section>
     <div>
-      <Crudpoll />
+      <CrudPoll />
     </div>
   </div>
 </template>
 
 <script>
 import Header from "./../components/Header.vue";
-import Crudpoll from "./../components/Crudpoll.vue";
+import CrudPoll from "./../components/CrudPoll";
 export default {
   name: "Poll",
   components: {
     Header,
-    Crudpoll,
+    CrudPoll,
   },
 };
 </script>
 
 <style>
-
 </style>

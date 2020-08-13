@@ -78,7 +78,7 @@ export default {
     } else if (this.$route.name === "Login") {
       this.adminbuttonshow = false;
     }
-    if (this.logginUser === "admin") {
+    if (this.logginUser === "Admin") {
       this.createpollbutton = true;
     }
   },

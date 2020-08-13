@@ -1,24 +1,16 @@
 <template>
   <div id="pollingpage">
-    <!-- <ul>
-      <li v-for="(item, index) in list_polls" v-bind:key="index">
-        <div>
-          <B>Q</B>
-          {{item.title}}
-        </div>
-        <div v-for="(item, index) in item.options" v-bind:key="index">{{item.option}}</div>
-      </li>
-    </ul>-->
     <div id="body">
-      <li v-for="(item, index) in list_polls" v-bind:key="index">
+      <li v-for="(item, poll_index) in list_polls" v-bind:key="poll_index">
         <div id="container">
           <div class="item">
-            <B>Q{{++index}}.</B>
+            <B>Q{{++poll_index}}.</B>
             {{item.title}}
-            <div v-for="(item, index) in item.options" v-bind:key="index">
-              <input type="checkbox" @change="changeflag(item.option)" />
-              {{item.option}}
+            <div v-for="(item_option, options_index) in item.options" v-bind:key="options_index">
+              <input type="radio" name="abc" @change="select_item(item._id, item_option.option)" />
+              {{item_option.option}}
             </div>
+            <a id="submitbutton" v-on:click="submit_vote(item._id)" class="button">Submit answer</a>
           </div>
         </div>
         <hr />
@@ -28,14 +20,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
-  name: "Guestpolling",
- 
+  name: "GuestPolling",
+
   data() {
     return {
-      checkflag: false,
-      chooseoption: {},
+      vote: {},
     };
   },
   computed: {
@@ -45,10 +36,17 @@ export default {
   },
 
   methods: {
-    changeflag(option) {
-      this.checkflag = !this.checkflag;
-      this.chooseoption = option;
-      // console.log(this.checkflag, this.chooseoption);
+    select_item(id, option) {
+      this.vote.id = id;
+      this.vote.option = option;
+    },
+    ...mapActions(["submitvote"]),
+    submit_vote(id) {
+      if (this.vote.id !== id) {
+        return alert("Please select from the option");
+      } else if (confirm("Are you sure ?")) {
+        this.submitvote(this.vote);
+      }
     },
   },
 };
@@ -74,6 +72,15 @@ span {
 a {
   margin-top: 10px;
   float: right;
+}
+
+#submitbutton {
+  margin-right: 45%;
+  border-color: rgb(4, 120, 228);
+}
+
+hr {
+  border-top: 1px solid rgb(255, 0, 119);
 }
 </style>
 

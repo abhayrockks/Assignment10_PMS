@@ -36,9 +36,9 @@ export default {
         password: this.password,
       });
 
-      if (this.user_exist !== "" && this.logginUser === "admin") {
+      if (this.user_exist !== "" && this.logginUser === "Admin") {
         this.$router.push("poll");
-      } else if (this.user_exist === 0 && this.logginUser === "Guest") {
+      } else if (this.user_exist !== "" && this.logginUser === "Guest") {
         this.$router.push("profile");
       } else if (this.user_exist === 1) {
         alert("User not Exist");

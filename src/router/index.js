@@ -51,12 +51,12 @@ const router = new VueRouter({
 //   } else {
 //     next();
 //   }
-//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'poll') && store.getters.logginuser === 'Guest') {
+//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'poll') && store.getters.logginUser === 'Guest') {
 //     next('/profile')
 //   } else {
 //     next();
 //   }
-//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'profile') && store.getters.logginuser === 'Admin') {
+//   if ((to.name.toLowerCase() === 'login' || to.name.toLowerCase() === 'admin' || to.name.toLowerCase() === 'profile') && store.getters.logginUser === 'Admin') {
 //     next('/poll')
 //   } else {
 //     next();

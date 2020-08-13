@@ -36,11 +36,11 @@ export default {
         password: this.password,
       });
 
-      if (this.user_exist !== "") {
+      if (this.user_exist !== "" && this.logginUser === "admin") {
         this.$router.push("poll");
-      } else if (this.user_exist == "0" && this.logginuser == "Guest") {
+      } else if (this.user_exist === 0 && this.logginUser === "Guest") {
         this.$router.push("profile");
-      } else if (this.user_exist == "1") {
+      } else if (this.user_exist === 1) {
         alert("User not Exist");
       } else {
         alert(this.api_error);
@@ -51,12 +51,11 @@ export default {
   computed: {
     ...mapGetters({
       api_error: "api_error",
-      logginuser: "logginuser",
+      logginUser: "logginUser",
       user_exist: "user_exist",
     }),
 
     login_progress() {
-      console.log("Hi");
       return this.$store.state.login.login_progress;
     },
   },

@@ -10,12 +10,12 @@ export default {
   name: "app",
 
   computed: {
-    ...mapGetters(["logginuser"]),
+    ...mapGetters(["logginUser"]),
   },
   mounted() {
-    if (this.logginuser == "Guest") {
+    if (this.logginUser == "Guest") {
       this.$router.push("/profile");
-    } else if (this.logginuser == "Admin") {
+    } else if (this.logginUser == "Admin") {
       this.$router.push("/poll");
     }
   },

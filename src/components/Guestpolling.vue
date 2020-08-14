@@ -7,8 +7,10 @@
             <B>Q{{++poll_index}}.</B>
             {{item.title}}
             <div v-for="(item_option, options_index) in item.options" v-bind:key="options_index">
-              <input type="radio" name="abc" @change="select_item(item._id, item_option.option)" />
-              {{item_option.option}}
+              <label>
+                <input type="radio" name="abc" @change="select_item(item._id, item_option.option)" />
+                {{item_option.option}}
+              </label>
             </div>
             <a id="submitbutton" v-on:click="submit_vote(item._id)" class="button">Submit answer</a>
           </div>
@@ -32,6 +34,7 @@ export default {
   computed: {
     ...mapGetters({
       list_polls: "list_polls",
+      submit_vote_response: "submit_vote_response",
     }),
   },
 
@@ -41,11 +44,19 @@ export default {
       this.vote.option = option;
     },
     ...mapActions(["submitvote"]),
-    submit_vote(id) {
+    async submit_vote(id) {
       if (this.vote.id !== id) {
         return alert("Please select from the option");
       } else if (confirm("Are you sure ?")) {
-        this.submitvote(this.vote);
+        await this.submitvote(this.vote);
+        this.vote = {};
+      }
+      if (this.submit_vote_response === 0) {
+        return alert("Answer submitted successfully");
+      } else if (this.vote.id) {
+        return alert("Please confirm to submit");
+      } else {
+        alert(this.submit_vote_response);
       }
     },
   },

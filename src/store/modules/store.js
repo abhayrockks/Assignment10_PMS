@@ -12,12 +12,14 @@ export default {
         delete_option: false,
         add_option: false,
         submit_vote: false,
+        submit_vote_response: false,
         user_exist: {},
         token_value: {},
         polls: {},
         updatedpoll: {}
     },
     getters: {
+        submit_vote_response: state => state.submit_vote_response.error,
         api_error: state => state.error,
         user_exist: state => state.user_exist.error,
         logginUser: state => state.token_value.role,
@@ -101,7 +103,6 @@ export default {
             }
         },
         async delete_option({ commit }, payload) {
-            console.log(payload)
             try {
                 commit("delete_option", true);
                 await axios.post(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.id}&option_text=${payload.delete_option}`);
@@ -129,7 +130,7 @@ export default {
                     commit("error", err)
                     return false
                 }
-            } else if(payload.condition === "2") {           
+            } else if (payload.condition === "2") {
                 try {
                     commit("edit_poll", true);
                     await axios.post(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.id}&title=${payload.title}`);
@@ -157,17 +158,18 @@ export default {
                     return false
                 }
             }
-            
+
         },
 
         async submitvote({ commit, state }, payload) {
             try {
                 commit("submit_vote", true);
-                let header = {
+                let headers = {
                     'Content-Type': 'application/json',
-                    'access_token': `${state.token}`,
+                    'access_token': state.token,
                 };
-                await axios.post(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.option}`, header);
+                const response = await axios.get(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.option}`, { headers });
+                commit("submit_vote_response", response.data)
                 commit("submit_vote", false);
                 return true
             } catch (err) {
@@ -234,6 +236,9 @@ export default {
         },
         submit_vote: (state, data) => {
             state.submit_vote = data;
+        },
+        submit_vote_response: (state, data) => {
+            state.submit_vote_response = data;
         },
     }
 }

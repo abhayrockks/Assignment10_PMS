@@ -3,19 +3,19 @@
     <form id="registration">
       <div class="form-group">
         <label>Username:</label>
-        <input type="text" v-model="username" required />
+        <input size="30" type="text" v-model="username" required />
       </div>
       <br />
 
       <div class="form-group">
         <label>Password:</label>
-        <input type="password" v-model="password" required />
+        <input size="30" type="password" v-model="password" required />
       </div>
       <br />
 
       <div class="form-group">
         <label>Confirm Password:</label>
-        <input id="confirm_password" type="password" v-model="confirm_password" required />
+        <input id="confirm_password" size="30" type="password" v-model="confirm_password" required />
       </div>
       <br />
       <div class="form-group">
@@ -43,7 +43,7 @@
       </div>
       <br />
       <div class="form-group">
-        <button @click="adduser" :class="{ 'button': true, 'is-full' : true,}">Add</button>
+        <button @click="adduser" :class="{ 'button': true, 'is-full' : true,}">Register</button>
       </div>
     </form>
   </div>
@@ -119,7 +119,7 @@ label {
 }
 
 #confirm_password {
-  padding-right: 60px;
+  margin-right: 60px;
 }
 
 #dropdown {

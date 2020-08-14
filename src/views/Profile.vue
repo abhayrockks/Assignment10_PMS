@@ -8,19 +8,19 @@
         </div>
       </div>
     </section>
-    <Guestpolling />
+    <GuestPolling />
   </div>
 </template>
 
 <script>
 import Header from "./../components/Header";
-import Guestpolling from "./../components/Guestpolling";
+import GuestPolling from "./../components/GuestPolling";
 
 export default {
   name: "Login",
   components: {
     Header,
-    Guestpolling,
+    GuestPolling,
   },
 };
 </script>

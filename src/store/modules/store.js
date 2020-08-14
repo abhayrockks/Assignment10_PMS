@@ -2,12 +2,16 @@ import axios from 'axios'
 
 export default {
     state: {
+        token: {},
         error: false,
         login_progress: false,
         register_progress: false,
         add_poll: false,
         delete_poll: false,
         edit_poll: false,
+        delete_option: false,
+        add_option: false,
+        submit_vote: false,
         user_exist: {},
         token_value: {},
         polls: {},
@@ -21,6 +25,19 @@ export default {
         list_polls: state => state.polls,
     },
     actions: {
+        async register({ commit }, payload) {
+            try {
+                commit("register_progress", true);
+                const response = await axios.post(`https://secure-refuge-14993.herokuapp.com/add_user?username=${payload.username}&password=${payload.password}&role=${payload.role}`);
+                commit("user_exist", response.data)
+                commit("register_progress", false);
+                return true
+            } catch (err) {
+                commit("register_progress", false);
+                commit("login_fail", err)
+                return false
+            }
+        },
         async login({ commit }, payload) {
             try {
                 commit("login_progress", true);
@@ -46,21 +63,6 @@ export default {
         logout({ commit }) {
             commit("logout")
         },
-
-        async register({ commit }, payload) {
-            try {
-                commit("register_progress", true);
-                const response = await axios.post(`https://secure-refuge-14993.herokuapp.com/add_user?username=${payload.username}&password=${payload.password}&role=${payload.role}`);
-                commit("user_exist", response.data)
-                commit("register_progress", false);
-                return true
-            } catch (err) {
-                commit("register_progress", false);
-                commit("login_fail", err)
-                return false
-            }
-        },
-
         async addnewpoll({ commit }, payload) {
             let options_string = "";
             payload.options.map((opt, index) => {
@@ -73,7 +75,7 @@ export default {
             })
             try {
                 commit("add_poll", true);
-                await axios.post(`https://secure-refuge-14993.herokuapp.com/add_poll?title=${payload.title}%20polll&options=${options_string}`);
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/add_poll?title=${payload.title}&options=${options_string}`);
                 const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
                 commit("list_polls", listofpolls.data);
                 commit("add_poll", false);
@@ -84,7 +86,6 @@ export default {
                 return false
             }
         },
-
         async deletepoll({ commit }, id) {
             try {
                 commit(" delete_poll", true);
@@ -99,16 +100,78 @@ export default {
                 return false
             }
         },
-        async editpoll({ commit }, payload) {
+        async delete_option({ commit }, payload) {
+            console.log(payload)
             try {
-                commit("edit_poll", true);
-                await axios.post(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.id}&title=${payload.title}`);
+                commit("delete_option", true);
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.id}&option_text=${payload.delete_option}`);
                 const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
                 commit("list_polls", listofpolls.data);
-                commit("edit_poll", false);
+                commit("delete_option", false);
                 return true
             } catch (err) {
-                commit("edit_poll", false);
+                commit("delete_option", false);
+                commit("error", err)
+                return false
+            }
+        },
+        async editpoll({ commit }, payload) {
+            if (payload.condition === "1") {
+                try {
+                    commit("edit_poll", true);
+                    await axios.post(`https://secure-refuge-14993.herokuapp.com/add_new_option?id=${payload.id}&option_text=${payload.option}`);
+                    const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                    commit("list_polls", listofpolls.data);
+                    commit("edit_poll", false);
+                    return true
+                } catch (err) {
+                    commit("edit_poll", false);
+                    commit("error", err)
+                    return false
+                }
+            } else if(payload.condition === "2") {           
+                try {
+                    commit("edit_poll", true);
+                    await axios.post(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.id}&title=${payload.title}`);
+                    const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                    commit("list_polls", listofpolls.data);
+                    commit("edit_poll", false);
+                    return true
+                } catch (err) {
+                    commit("edit_poll", false);
+                    commit("error", err)
+                    return false
+                }
+            } else {
+                try {
+                    commit("edit_poll", true);
+                    await axios.post(`https://secure-refuge-14993.herokuapp.com/add_new_option?id=${payload.id}&option_text=${payload.option}`);
+                    await axios.post(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.id}&title=${payload.title}`);
+                    const listofpolls = await axios.get("https://secure-refuge-14993.herokuapp.com/list_polls");
+                    commit("list_polls", listofpolls.data);
+                    commit("edit_poll", false);
+                    return true
+                } catch (err) {
+                    commit("edit_poll", false);
+                    commit("error", err)
+                    return false
+                }
+            }
+            
+        },
+
+        async submitvote({ commit, state }, payload) {
+            try {
+                commit("submit_vote", true);
+                let header = {
+                    'Content-Type': 'application/json',
+                    'access_token': `${state.token}`,
+                };
+                await axios.post(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.option}`, header);
+                commit("submit_vote", false);
+                return true
+            } catch (err) {
+                commit("submit_vote", false);
                 commit("error", err)
                 return false
             }
@@ -116,6 +179,7 @@ export default {
     },
     mutations: {
         extract_token: (state, token) => {
+            state.token = token;
             function parseJwt(token) {
                 var base64Url = token.split('.')[1];
                 var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -144,6 +208,8 @@ export default {
             state.user_exist = {};
             state.polls = {};
             state.updatedpoll = {};
+            state.token = {};
+            state.error = false;
         },
         list_polls: (state, data) => {
             state.polls = data.data;
@@ -159,6 +225,15 @@ export default {
         },
         edit_poll: (state, data) => {
             state.delete_poll = data;
+        },
+        delete_option: (state, data) => {
+            state.delete_option = data;
+        },
+        add_option: (state, data) => {
+            state.add_option = data;
+        },
+        submit_vote: (state, data) => {
+            state.submit_vote = data;
         },
     }
 }
